@@ -1,0 +1,47 @@
+server:
+  port: 8090
+
+dh:
+  keycloak:
+    serverUrl: http://localhost:8085/
+    realm: DigitalMedia
+    clientId: microservicios
+    clientSecret: nt2kiG6XXxtrVSRUWSH14eagW5J5ZQIv
+
+spring:
+  application:
+    name: users-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8085/realms/${dh.keycloak.realm}
+          jwk-set-uri: http://localhost:8085/realms/${dh.keycloak.realm}/protocol/openid-connect/certs
+      client:
+        provider:
+          keycloak-provider:
+            issuer-uri: http://localhost:8085/realms/${dh.keycloak.realm}
+        registration:
+          keycloak:
+            provider: keycloak-provider
+            client-id: ${dh.keycloak.clientId}
+            client-secret: ${dh.keycloak.clientSecret}
+            authorization-grant-type: client_credentials
+            redirect-uri: 'http://localhost:8080/login/oauth2/code/keycloak'
+property:
+  keycloak:
+    jwt:
+      cert:
+        uri: ${spring.security.oauth2.client.provider.keycloak-provider.issuer-uri}/protocol/openid-connect/certs
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    enabled: true
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+
+
+
